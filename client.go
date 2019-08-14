@@ -671,7 +671,11 @@ func (client *client) getOffset(topic string, partitionID int32, time int64) (in
 	}
 
 	request := &OffsetRequest{}
-	if client.conf.Version.IsAtLeast(V0_10_1_0) {
+	switch {
+	case client.conf.Version.IsAtLeast(V0_11_0_0):
+		request.Version = 2
+		request.IsolationLevel = client.conf.Consumer.IsolationLevel
+	case client.conf.Version.IsAtLeast(V0_10_1_0):
 		request.Version = 1
 	}
 	request.AddBlock(topic, partitionID, time, 1)
